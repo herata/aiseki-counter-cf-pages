@@ -5,8 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	type ChartConfig,
 	ChartContainer,
-	ChartLegend,
-	ChartLegendContent,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -19,22 +17,27 @@ import {
 } from "@/components/ui/select";
 import { useVisitorData } from "@/hook/use-visitor-data";
 import { getStoresByPrefecture, prefectures } from "@/lib/stores";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useMemo, useState } from "react";
 import {
 	CartesianGrid,
 	Line,
 	LineChart,
-	ResponsiveContainer,
 	XAxis,
 	YAxis,
 } from "recharts";
 
+const getDefaultDate = () => {
+	const now = new Date();
+	const hour = now.getHours();
+	return hour < 18 ? subDays(now, 1) : now;
+};
+
 export default function Home() {
 	const [prefecture, setPrefecture] = useState<string | null>(null);
 	const [shop, setShop] = useState<string | null>(null);
-	const [date, setDate] = useState<Date>(new Date());
+	const [date, setDate] = useState<Date>(getDefaultDate());
 
 	const stores = useMemo(
 		() => (prefecture ? getStoresByPrefecture(prefecture) : []),
@@ -119,21 +122,21 @@ export default function Home() {
 						/>
 					</div>
 
-					<div className="h-[600px] sm:h-[400px] w-full">
+					<div className="min-h-100 w-full">
 						{!shop && (
-							<div className="h-full flex items-center justify-center text-muted-foreground">
+							<div className="min-h-100 flex items-center justify-center text-muted-foreground">
 								店舗を選択してください
 							</div>
 						)}
 
 						{shop && isLoading && (
-							<div className="h-full flex items-center justify-center text-muted-foreground">
+							<div className="min-h-100 flex items-center justify-center text-muted-foreground">
 								データを取得中...
 							</div>
 						)}
 
 						{shop && error && (
-							<div className="h-full flex items-center justify-center text-destructive">
+							<div className="min-h-100 flex items-center justify-center text-destructive">
 								エラーが発生しました: {error.message}
 							</div>
 						)}
@@ -159,7 +162,6 @@ export default function Home() {
 										domain={[0, "auto"]}
 									/>
 									<ChartTooltip content={<ChartTooltipContent />} />
-									<ChartLegend content={<ChartLegendContent />} />
 									<Line
 										type="monotone"
 										dataKey="male"

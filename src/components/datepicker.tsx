@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { format } from "date-fns"
+import { format, isFuture, startOfTomorrow } from "date-fns"
 import { ja } from "date-fns/locale"
 import { Calendar as CalendarIcon } from "lucide-react"
 
@@ -27,6 +27,8 @@ export function DatePicker({ date, onSelect }: DatePickerProps) {
     setOpen(false)
   }
 
+  const tomorrow = startOfTomorrow()
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -47,6 +49,7 @@ export function DatePicker({ date, onSelect }: DatePickerProps) {
           selected={date}
           onSelect={handleSelect}
           locale={ja}
+          disabled={(date) => isFuture(date) || date >= tomorrow}
           initialFocus
         />
       </PopoverContent>
