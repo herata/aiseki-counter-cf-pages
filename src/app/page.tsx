@@ -20,6 +20,7 @@ import { getStoresByPrefecture, prefectures } from "@/lib/stores";
 import { format, subDays } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useMemo, useState } from "react";
+import { useStoredState } from "@/hook/use-stored-state";
 import {
 	CartesianGrid,
 	Line,
@@ -35,24 +36,24 @@ const getDefaultDate = () => {
 };
 
 export default function Home() {
-	const [prefecture, setPrefecture] = useState<string | null>(null);
-	const [shop, setShop] = useState<string | null>(null);
+	const [prefecture, setPrefecture] = useStoredState<string>("selectedPrefecture");
+	const [shop, setShop] = useStoredState<string>("selectedShop");
 	const [date, setDate] = useState<Date>(getDefaultDate());
-
+	
 	const stores = useMemo(
-		() => (prefecture ? getStoresByPrefecture(prefecture) : []),
-		[prefecture],
+	() => (prefecture ? getStoresByPrefecture(prefecture) : []),
+	[prefecture],
 	);
-
+	
 	const { data, comparisonData, isLoading, error } = useVisitorData({
-		shop: shop || "",
-		date: format(date, "yyyy-MM-dd"),
+	shop: shop ?? "",
+	date: format(date, "yyyy-MM-dd"),
 	});
-
+	
 	const chartData = useMemo(() => {
-		if (!data || !comparisonData) return [];
-
-		// 基準時刻を18:00に設定
+	if (!data || !comparisonData) return [];
+	
+	// Set the base time to 18:00
 		const baseDate = new Date(date);
 		baseDate.setHours(18, 0, 0, 0);
 		
@@ -87,15 +88,15 @@ export default function Home() {
 		  }
 		}
 
-		// 30分間隔でのポイント生成
+		// Generate data points at 30-minute intervals
 		const timePoints = [];
 		let current = new Date(startTime);
-		const slotInterval = 30 * 60 * 1000; // 30分
-
+		const slotInterval = 30 * 60 * 1000; // 30 minutes
+		
 		while (current <= endTime) {
 		  const hour = current.getHours();
 		  
-		  // 18:00-2:50の範囲内のみ処理
+		  // Process only within the 18:00-2:50 range
 		  if (hour >= 18 || hour < 3) {
 		    const timeKey = format(current, "HH:mm", { locale: ja });
 		    const currentData = dataByHour.get(timeKey);
@@ -147,9 +148,9 @@ export default function Home() {
 						</Select>
 
 						<Select
-							value={shop || ""}
-							onValueChange={setShop}
-							disabled={!prefecture}
+						value={shop ?? ""}
+						onValueChange={setShop}
+						disabled={!prefecture}
 						>
 							<SelectTrigger className="w-full sm:w-[180px]">
 								<SelectValue placeholder="店舗を選択" />
