@@ -52,24 +52,71 @@ export default function Home() {
 	const chartData = useMemo(() => {
 		if (!data || !comparisonData) return [];
 
-		return data.data
-			.map((current, index) => {
-				const comparison = comparisonData.data[index];
-				const date = new Date(current.timestamp * 1000);
+		// 基準時刻を18:00に設定
+		const baseDate = new Date(date);
+		baseDate.setHours(18, 0, 0, 0);
+		
+		// Set reference time range (18:00 to 2:50 next day)
+		const startTime = new Date(date);
+		startTime.setHours(18, 0, 0, 0);
+		const endTime = new Date(date);
+		endTime.setDate(endTime.getDate() + 1);
+		endTime.setHours(2, 50, 0, 0);
 
-				return {
-					timestamp: date,
-					time: format(date, "HH:mm", { locale: ja }),
-					hour: date.getHours(),
-					male: current.male,
-					female: current.female,
-					prevMale: comparison?.male || 0,
-					prevFemale: comparison?.female || 0,
-				};
-			})
-			.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-			.filter((item) => item.hour >= 18 || item.hour < 4);
-	}, [data, comparisonData]);
+		// Sort data by timestamp
+		const sortedData = [...data.data].sort((a, b) => a.timestamp - b.timestamp);
+		const sortedComparisonData = [...comparisonData.data].sort((a, b) => a.timestamp - b.timestamp);
+
+		// Group data by time slot
+		const dataByHour = new Map();
+		const comparisonByHour = new Map();
+
+		for (const item of sortedData) {
+		  const date = new Date(item.timestamp * 1000);
+		  const timeKey = format(date, "HH:mm");
+		  if (!dataByHour.has(timeKey)) {
+		    dataByHour.set(timeKey, item);
+		  }
+		}
+
+		for (const item of sortedComparisonData) {
+		  const date = new Date(item.timestamp * 1000);
+		  const timeKey = format(date, "HH:mm");
+		  if (!comparisonByHour.has(timeKey)) {
+		    comparisonByHour.set(timeKey, item);
+		  }
+		}
+
+		// 30分間隔でのポイント生成
+		const timePoints = [];
+		let current = new Date(startTime);
+		const slotInterval = 30 * 60 * 1000; // 30分
+
+		while (current <= endTime) {
+		  const hour = current.getHours();
+		  
+		  // 18:00-2:50の範囲内のみ処理
+		  if (hour >= 18 || hour < 3) {
+		    const timeKey = format(current, "HH:mm", { locale: ja });
+		    const currentData = dataByHour.get(timeKey);
+		    const comparisonData = comparisonByHour.get(timeKey);
+
+		    timePoints.push({
+		      timestamp: current,
+		      time: timeKey,
+		      hour: hour,
+		      male: currentData?.male,
+		      female: currentData?.female,
+		      prevMale: comparisonData?.male,
+		      prevFemale: comparisonData?.female,
+		    });
+		  }
+
+		  current = new Date(current.getTime() + slotInterval);
+		}
+
+		return timePoints;
+	}, [data, comparisonData, date]);
 
 	const chartConfig = {
 		male: { color: "#2563eb", label: "男性" },
@@ -149,11 +196,12 @@ export default function Home() {
 								>
 									<CartesianGrid strokeDasharray="3 3" opacity={0.3} />
 									<XAxis
-										dataKey="time"
-										tick={{ fill: "#666" }}
-										tickMargin={8}
-										interval="preserveStartEnd"
-										minTickGap={30}
+									dataKey="time"
+									tick={{ fill: "#666" }}
+									tickMargin={8}
+									interval="preserveStartEnd"
+									minTickGap={30}
+									domain={["18:00", "02:50"]}
 									/>
 									<YAxis
 										tick={{ fill: "#666" }}
