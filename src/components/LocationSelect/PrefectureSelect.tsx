@@ -9,8 +9,8 @@ interface PrefectureSelectProps {
 export function PrefectureSelect({ value, onValueChange }: PrefectureSelectProps) {
   return (
     <Select value={value ?? ""} onValueChange={onValueChange}>
-      <SelectTrigger className="w-full sm:w-[180px]">
-        <SelectValue placeholder="都道府県を選択" />
+      <SelectTrigger className="h-9 w-full bg-white border-slate-200">
+        <SelectValue placeholder="都道府県" />
       </SelectTrigger>
       <SelectContent>
         {prefectures.map((pref) => (

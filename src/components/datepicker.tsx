@@ -1,58 +1,45 @@
-"use client"
-
-import * as React from "react"
-import { format, isFuture, startOfTomorrow } from "date-fns"
-import { ja } from "date-fns/locale"
-import { Calendar as CalendarIcon } from "lucide-react"
-
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "./ui/button";
+import { ja } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 interface DatePickerProps {
-  date?: Date
-  onSelect: (date: Date | undefined) => void
+  date?: Date;
+  onSelect?: (date: Date | undefined) => void;
 }
 
 export function DatePicker({ date, onSelect }: DatePickerProps) {
-  const [open, setOpen] = React.useState(false)
-
-  const handleSelect = (newDate: Date | undefined) => {
-    onSelect(newDate)
-    setOpen(false)
-  }
-
-  const tomorrow = startOfTomorrow()
+  const disableDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return date > today;
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={"outline"}
+          variant="outline"
           className={cn(
-            "w-full sm:w-[180px] justify-start text-left font-normal",
+            "h-9 w-full justify-start text-left font-normal bg-white border-slate-200",
             !date && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "yyyy年MM月dd日", { locale: ja }) : <span>日付を選択</span>}
+          {date ? format(date, "yyyy/MM/dd", { locale: ja }) : "日付を選択"}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
           selected={date}
-          onSelect={handleSelect}
-          locale={ja}
-          disabled={(date) => isFuture(date) || date >= tomorrow}
+          onSelect={onSelect}
+          disabled={disableDate}
           initialFocus
+          locale={ja}
         />
       </PopoverContent>
     </Popover>
-  )
+  );
 }

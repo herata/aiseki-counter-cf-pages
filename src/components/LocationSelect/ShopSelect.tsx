@@ -14,19 +14,31 @@ export function ShopSelect({
   stores,
   disabled = false
 }: ShopSelectProps) {
+  const formatShopLabel = (store: Store) => {
+    return `${store.name} ${store.location}`;
+  };
+
+  const selectedStore = stores.find(store => store.id === value);
+
   return (
     <Select
       value={value ?? ""}
       onValueChange={onValueChange}
       disabled={disabled}
     >
-      <SelectTrigger className="w-full sm:w-[180px]">
-        <SelectValue placeholder="店舗を選択" />
+      <SelectTrigger className="h-9 w-full bg-white border-slate-200">
+        <SelectValue placeholder="店舗">
+          {selectedStore && formatShopLabel(selectedStore)}
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
         {stores.map((store) => (
-          <SelectItem key={store.id} value={store.id}>
-            {store.name} ({store.location})
+          <SelectItem
+            key={store.id}
+            value={store.id}
+            className="font-normal"
+          >
+            {formatShopLabel(store)}
           </SelectItem>
         ))}
       </SelectContent>

@@ -23,7 +23,7 @@ export function LocationSelect({
   onDateChange,
 }: LocationSelectProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
       <PrefectureSelect 
         value={prefecture}
         onValueChange={onPrefectureChange}

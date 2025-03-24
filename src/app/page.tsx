@@ -3,12 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useVisitorData } from "@/hook/use-visitor-data";
 import { getStoresByPrefecture } from "@/lib/stores";
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import { useStoredState } from "@/hook/use-stored-state";
 import { LocationSelect } from "@/components/LocationSelect/LocationSelect";
 import { VisitorChart } from "@/components/VisitorChart/VisitorChart";
 import { useChartData } from "@/hooks/useChartData";
+import { subDays } from "date-fns";
 import type { VisitorData } from "@/types/visitor";
 
 const getDefaultDate = () => {
@@ -60,29 +61,33 @@ export default function Home() {
   );
 
   return (
-    <div className="flex flex-col container mx-auto items-center gap-3 p-4">
-      <Card className="w-full max-w-4xl">
-        <CardHeader>
-          <CardTitle>相席カウンター</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <LocationSelect
-            prefecture={prefecture}
-            onPrefectureChange={setPrefecture}
-            shop={shop}
-            onShopChange={setShop}
-            stores={stores}
-            date={date}
-            onDateChange={setDate}
-          />
-          <VisitorChart
-            data={chartData}
-            isLoading={isLoading}
-            error={error}
-            showChart={!!shop}
-          />
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto py-6">
+        <div className="max-w-3xl mx-auto px-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle>相席カウンター</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6">
+              <LocationSelect
+                prefecture={prefecture}
+                onPrefectureChange={setPrefecture}
+                shop={shop}
+                onShopChange={setShop}
+                stores={stores}
+                date={date}
+                onDateChange={setDate}
+              />
+              <VisitorChart
+                data={chartData}
+                isLoading={isLoading}
+                error={error}
+                showChart={!!shop}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
