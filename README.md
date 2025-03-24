@@ -2,13 +2,25 @@
 
 このプロジェクトは[Next.js](https://nextjs.org/)を使用して作成された、相席店舗の男女別人数推移を可視化するWebアプリケーションです。[`c3`](https://developers.cloudflare.com/pages/get-started/c3)でブートストラップされています。
 
+デプロイ先: [https://aiseki-counter.pages.dev](https://aiseki-counter.pages.dev)
+
 ## 機能
 
 - 都道府県と店舗の選択
-- 日付の選択
+- 日付の選択（当日まで）
 - 18:00から翌2:50までの男女別人数推移のグラフ表示
-- 当日と前週の比較表示
+- 当日と前週の比較表示（前週は半透明で表示）
 - データ欠損時も一貫した時間範囲での表示
+- 選択状態のセッション維持
+
+## 使用技術
+
+- **フレームワーク**: Next.js 14
+- **スタイリング**: Tailwind CSS
+- **UI コンポーネント**: shadcn/ui
+- **グラフ表示**: Recharts
+- **デプロイ**: Cloudflare Pages
+- **開発ツール**: TypeScript, Biome
 
 ## 開発の始め方
 
@@ -47,6 +59,21 @@ Bindingsは開発時、ローカルプレビュー時、そしてデプロイさ
 - デプロイされたアプリケーションでBindingsを使用するには、Cloudflare[ダッシュボード](https://dash.cloudflare.com/)で設定する必要があります。
 
 詳細は各ドキュメントを参照してください。
+
+## プロジェクト構成
+
+```
+src/
+  ├── app/              # Appルーター
+  ├── components/       # UIコンポーネント
+  │   ├── LocationSelect/  # 場所選択関連
+  │   ├── VisitorChart/    # グラフ表示関連
+  │   └── ui/             # 共通UIコンポーネント
+  ├── hooks/           # カスタムフック
+  ├── lib/            # ユーティリティ
+  ├── provider/       # プロバイダー
+  └── types/          # 型定義
+```
 
 ## コードガイドライン
 
